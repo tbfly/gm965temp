@@ -1,0 +1,43 @@
+
+Installation:
+-------------
+
+1. To build this module
+   make
+
+2. To install it.
+   sudo make install
+
+3. Use patched "sensor-detect.gm965temp"
+   It can detect gm965temp support chips.
+
+4. Enjoy gm965temp and help us to improve it.
+
+5. Notes.
+
+Support Chips:
+--------------
+
+. Intel 3 Series : G33/Q33 P35/Q35
+. Intel 4 Series : G41 B43/G43/Q43 G45/P45/Q45
+. Mobile Intel 965 Express : GL/GLE960 PM/GM/GME965
+. Mobile Intel 4 Series : PM/GM45
+
+Testing Status:
+---------------
+
+PM/GM965  : TR1, RTR1 report reasonable values 50 - 65°C
+PM45      : TR1 reports 0°C
+remaining : yet untested
+
+Remarks:
+--------
+
+On a cold start temperature reporting may be 0 degC due to
+hardware not permitting temperature reading below a certain
+temperature threshold. After a few minutes chipset temp
+should be >= 40 degC and gm965temp module is supposed to
+deliver values.
+
+Ocassionally but rarely reported temps may flip to 0 degC.
+
