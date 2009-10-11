@@ -36,7 +36,7 @@
 #define DRVNAME "gm965temp"
 
 #define USE_RTR   /*Flag for report method*/
-#define DEBUG
+/*#define DEBUG*/
 
 enum { SHOW_TEMP, SHOW_TJMAX, SHOW_TTARGET, SHOW_LABEL } SHOW;
 
@@ -137,7 +137,7 @@ static ssize_t show_label(struct device *dev,
 		struct device_attribute *devattr,
 		char *buf)
 {
-	return sprintf(buf, "GM965 IGP\n");
+	return sprintf(buf, "GM965 IGP temp reportor\n");
 }
 
 
@@ -161,7 +161,7 @@ static ssize_t show_label(struct device *dev,
 #define HTPS_MASK  0xFF00	/*bits 15:8*/
 #define CTPS_MASK  0xFF		/*bits 7:0*/
 
-#define MAX_RETRIES  36
+#define MAX_RETRIES  3
 
 static struct gm965temp_data *gm965temp_update_device(struct device *dev)
 {
@@ -215,7 +215,7 @@ static struct gm965temp_data *gm965temp_update_device(struct device *dev)
 		/* Wait for the thermal sensor read ready */
 		while (!(tss1_val & tmov) && (0 < i--)) {
 			mdelay(1);
-			udelay(300);
+			udelay(600);
 			if (IS_GM)
 				tss1_val = igp_read_short(data, tss1);
 			else
@@ -391,8 +391,8 @@ static unsigned long chipset_ids[] = {
 
 static int __devinit gm965temp_probe(struct platform_device *pdev)
 {
-	struct gm965temp_data *data;
-	struct resource *reso;
+	struct gm965temp_data *data = NULL;
+	struct resource *reso = NULL;
 	int i;
 	int res = -ENODEV;
 
@@ -486,7 +486,7 @@ static void __exit gm965temp_exit(void)
 
 MODULE_AUTHOR("Lu Zhihe");
 MODULE_DESCRIPTION("Intel GM965 chipset IGP temperature sensor");
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL and additional rights");
 
 module_init(gm965temp_init);
 module_exit(gm965temp_exit);
