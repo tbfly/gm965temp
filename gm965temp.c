@@ -161,7 +161,7 @@ static ssize_t show_label(struct device *dev,
 #define HTPS_MASK  0xFF00	/*bits 15:8*/
 #define CTPS_MASK  0xFF		/*bits 7:0*/
 
-#define MAX_RETRIES  3
+#define MAX_RETRIES  36
 
 static struct gm965temp_data *gm965temp_update_device(struct device *dev)
 {
@@ -173,14 +173,10 @@ static struct gm965temp_data *gm965temp_update_device(struct device *dev)
 #else
 	unsigned char  tr1_val = 0;
 #endif
-	unsigned short tss1_val = 0;
-	unsigned short tmov = 0;
-	unsigned int tsttp_val = 0; 
-	unsigned int htps_val = 0;
+	unsigned short tss1_val = 0, tmov = 0;
+	unsigned int tsttp_val = 0, htps_val = 0;
 	char relt_val = 0;
-	unsigned int tsc1 = 0;
-	unsigned int tss1 = 0;
-	unsigned int tse = 0;
+	unsigned int tsc1 = 0, tss1 = 0, tse = 0;
 	int temp_val = 0;
 	int i = MAX_RETRIES;
 
@@ -284,14 +280,6 @@ static ssize_t show_temp(struct device *dev,
 	if (attr->index == SHOW_TEMP) {
 		data = gm965temp_update_device(dev);
 		temp = data->temp;
-
- 		/* deprecated code:
-		*
-		* if (!temp)
-		* 	printk(KERN_WARNING "YourNB temperature is under "
-		*		"40 degC\n");
-		*/
-
 		return sprintf(buf, "%d\n", temp);
 	} else {
 		unsigned int TjMax = 110;
@@ -350,8 +338,8 @@ err:
 static int __devinit gm965_find_registers(struct gm965temp_data *data,
 					    unsigned long devid)
 {
-	struct pci_dev *pcidev;
-	u32 val32;
+	struct pci_dev *pcidev = NULL;
+	u32 val32 = 0x0UL;
 	u64 val64 = 0x0ULL;
 	int res = -ENODEV;
 
@@ -359,7 +347,8 @@ static int __devinit gm965_find_registers(struct gm965temp_data *data,
 				devid,
 				NULL);
 	if (!pcidev) {
-		printk(KERN_ERR "pci_get_device failed\n");
+		printk(KERN_INFO "Try pci_get_device devid 0x%lx failed\n",
+                                devid);
 		return -ENODEV;
 	}
 
@@ -478,9 +467,7 @@ static struct platform_driver gm965temp_driver = {
 
 static int __init gm965temp_init(void)
 {
-	int res;
-
-	res = platform_driver_register(&gm965temp_driver);
+	int res = platform_driver_register(&gm965temp_driver);
 	if (res)
 		return res;
 
